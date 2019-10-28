@@ -40,6 +40,8 @@ private
 
   def long_query_string?(data)
     data["page_path"].length > PAGE_PATH_LENGTH_LIMIT && URI.parse(data["page_path"]).query.present?
+  rescue URI::InvalidURIError
+    true # invalid URI, so let's reject it
   end
 
   def extract_dimensions_and_metrics(row)

@@ -249,5 +249,31 @@ RSpec.describe Dimensions::Edition, type: :model do
 
       expect(-> { create :edition, base_path: "value", live: false }).to_not raise_error
     end
+
+    # Sentry error: https://sentry.io/organizations/govuk/issues/1517959668/events/latest/?environment=production&project=1461890&query=is%3Aunresolved
+    #
+    # Details:
+    #
+    # PG::UniqueViolation: ERROR:  duplicate key value violates unique constraint "index_dimensions_editions_on_live_and_base_path"
+    # DETAIL:  Key (live, base_path)=(t, /government/publications/british-forces-post-office-last-dates-of-posting/british-forces-post-office-last-dates-of-posting-for-christmas) already exists.
+    # : UPDATE "dimensions_editions" SET "updated_at" = $1, "live" = $2 WHERE "dimensions_editions"."id" = $3
+    #
+    # HOWEVER, there are no results when we run this:
+    #
+    # Dimensions::Edition.where(
+    #   base_path: "/government/publications/british-forces-post-office-last-dates-of-posting/british-forces-post-office-last-dates-of-posting-for-christmas",
+    #   live: true)
+    # => #<ActiveRecord::Relation []>
+    #
+    # Dimensions::Edition.where(base_path: "/government/publications/british-forces-post-office-last-dates-of-posting/british-forces-post-office-last-dates-of-posting-for-christmas", live: false).count
+    # => 2
+    #
+    # Hmmmm maybe `"live" = $2` is actually `"live" = false`.
+    # Let's explore if that raises an exception below:
+    it "does not prevent duplicating `base_path` for other content items that aren't live" do
+      create :edition, base_path: "value", content_id: "abc123", live: false
+
+      expect(-> { create :edition, base_path: "value", content_id: "def456", live: false }).to_not raise_error
+    end
   end
 end

@@ -40,6 +40,12 @@ class Dimensions::Date < ApplicationRecord
     Dimensions::Date.where(date: date).exists?
   end
 
+private
+
+  def leap_year?
+    Date.leap?(year)
+  end
+
   validates :date, presence: true
 
   validates :date_name, presence: true
@@ -75,7 +81,14 @@ class Dimensions::Date < ApplicationRecord
   validates :day_of_year,
             presence: true,
             numericality: { only_integer: true },
-            inclusion: { in: (1..365) }
+            inclusion: { in: (1..365) },
+            unless: :leap_year?
+
+  validates :day_of_year,
+            presence: true,
+            numericality: { only_integer: true },
+            inclusion: { in: (1..366) },
+            if: :leap_year?
 
   validates :day_of_quarter,
             presence: true,

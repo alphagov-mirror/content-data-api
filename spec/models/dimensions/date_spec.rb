@@ -53,6 +53,11 @@ RSpec.describe Dimensions::Date, type: :model do
   it { is_expected.to validate_numericality_of(:day_of_year).only_integer }
   it { is_expected.to validate_inclusion_of(:day_of_year).in_range(1..365) }
 
+  context "leap year" do
+    let(:date) { ::Date.new(2020, 12, 31) }
+    it { is_expected.to validate_inclusion_of(:day_of_year).in_range(1..366) }
+  end
+
   it { is_expected.to validate_presence_of(:day_of_quarter) }
   it { is_expected.to validate_numericality_of(:day_of_quarter).only_integer }
   it { is_expected.to validate_inclusion_of(:day_of_quarter).in_range(1..124) }

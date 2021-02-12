@@ -35,6 +35,7 @@ RSpec.describe Etl::Edition::Content::Parser do
       role_appointment
       special_route
       topic
+      topical_event
       world_location
       vanish
     ]

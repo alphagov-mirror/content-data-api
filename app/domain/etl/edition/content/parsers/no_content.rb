@@ -34,6 +34,7 @@ class Etl::Edition::Content::Parsers::NoContent
       role_appointment
       special_route
       topic
+      topical_event
       world_location
       vanish
     ]
